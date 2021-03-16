@@ -1,9 +1,14 @@
 const express = require('express');
+const multer = require('multer');
+const helpers = require('./helpers');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { response } = require('express');
 const dao = require('./dao');
+const { Console, debug } = require('console');
+const fs = require('fs');
+const { Http2ServerRequest } = require('http2');
 // const dao = require('./dao.js');
 
 const app = express();
@@ -19,6 +24,16 @@ app.get('/', (req, res) => {
     res.status(200).sendFile('index.html', {
         root: path.resolve('../public')
     });
+});
+
+const storage = multer.diskStorage({
+    destination: function(request, file, cb) {
+        cb(null, 'uploads/');
+    },
+
+    filename: function(request, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
 });
 
 app.get('/whichIsBetter', (req, res)  => {
@@ -71,9 +86,40 @@ app.get('/insertMeme', (request, response) => {
 })
 
 app.get('/getMeme', async (request, response) => {
+    fs.readdir("../public/img", (err, files) => {
+        files.forEach(file => {
+            fs.unlink("../public/img/" + file, (err => {
+                if (err) console.log(err);
+            }));
+        });
+    });
+
     var randomMeme = await dao.getRandomMeme();
-    randomMeme = "<image id='meme' src='" + randomMeme + "'>";
+    randomMeme = "<image id='meme' src='img/" + randomMeme + "'>";
     response.status(200).send(randomMeme);
+})
+
+app.post('/meme', function(request, response, next) {
+    let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).single('meme');
+    upload(request, response, function(err) {
+        if (request.fileValidationError) {
+            return response.send(request.fileValidationError);
+        } else if (!request.file) {
+            return response.send('Please select a meme to upload');
+        } else if (err instanceof multer.MulterError) {
+            return response.send(err);
+        } else if (err) {
+            return response.send(err);
+        }
+        dao.insertMeme(request.file);
+        fs.unlink(request.file.path, (err => {
+            if (err) console.log(err);
+        }));
+    });
+
+    response.redirect('http://localhost:3000/index.html');
+
+    response.end();
 })
 
 app.listen(port, () => {
