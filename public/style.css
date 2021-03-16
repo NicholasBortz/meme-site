@@ -14,6 +14,30 @@ nav ul li {
     margin-right: 10px;
 }
 
+button, input[type=submit] {
+	width: 50%;
+	padding: 12px 20px;
+	margin: 8px 0;
+}
+
+button, input {
+	box-sizing: border-box;
+	background: #1b7ca1;
+	border: 0px solid white;
+	border-radius: 5px;
+	box-shadow: 2px 2px #116080;
+	font-size: 1em;
+	outline: none;
+}
+
+input[type=file] {
+	color: black;
+}
+
+button:hover, input[type=submit]:hover, input[type=file]:hover {
+	background: #166e91;
+}
+
 a {
 	color: #ee6f57;
 	font-weight: bold;
