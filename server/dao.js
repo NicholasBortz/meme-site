@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+var fs = require('fs');
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -11,7 +12,7 @@ con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
 
-  var createTable = "CREATE TABLE IF NOT EXISTS meme (id INT AUTO_INCREMENT, url VARCHAR(2083), PRIMARY KEY(id));";
+  var createTable = "CREATE TABLE IF NOT EXISTS meme (id INT AUTO_INCREMENT, meme MEDIUMBLOB, type VARCHAR(25), name VARCHAR(256), PRIMARY KEY(id));";
   con.query(createTable, function (err, result) {
     if (err) throw err;
     console.log("Table created");
@@ -57,11 +58,11 @@ module.exports = {
     });    
   },
 
-  insertMeme: function (filePath) {
-    con.query("INSERT INTO meme (url) VALUES( ? )", filePath,
-      function (err, result) {
-        if (err) throw err;
-      });
+  insertMeme: function (meme) {
+    con.query("INSERT INTO meme (meme, type, name) VALUES( ? )", [[fs.readFileSync(meme.path), meme.mimetype, meme.filename]],
+    function (err, result) {
+      if (err) throw err;
+    });
   },
   getRandomMeme: function () {
     return new Promise(function(resolve, reject) {
@@ -69,8 +70,12 @@ module.exports = {
         if (err) throw err;
   
         randIndex = Math.floor(Math.random() * Math.floor(result.length));
+        const extension = result[randIndex]["type"].split("/").pop();
 
-        resolve(result[randIndex]["url"]);
+        const img = fs.writeFile("../public/img/" + result[randIndex]["name"], result[randIndex]["meme"], function(err) {
+          if (err) throw err;
+        });
+        resolve(result[randIndex]["name"]);
       });
     });
   }
