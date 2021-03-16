@@ -65,14 +65,25 @@
 		<h1>Test Memer, Best Memer!</h1>
 
 		<div id="main" class="main-text">
-			<div class="main-text">
+			<!-- <div class="main-text">
 				<button onclick="insertMeme()">Insert a new meme</button>
 				<input id="url" type="text">
+			</div> -->
+
+			<div class="main-text">
+				<h2>Insert a Meme Here</h2>
+				<form action="meme" method="POST" enctype="multipart/form-data">
+					<input type="file" name="meme" />
+					<br />
+					<input type="submit" value="Upload" />
+				</form>
 			</div>
+			
 			<div class="main-text">
 				<button onclick="getMeme()">Meme Time!</button>
 			</div>
-			<div id="memer" class="main-text"></div>
+			<div id="memer" class="main-text">
+			</div>
 			<!-- <div class="main-text">
 				<button onclick="getImp()">Am I a crewmate or an imposter?</button>
 			</div>
