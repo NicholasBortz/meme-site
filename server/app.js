@@ -99,7 +99,7 @@ app.get('/getMeme', async (request, response) => {
     response.status(200).send(randomMeme);
 })
 
-app.post('/meme', function(request, response, next) {
+app.post('/meme', async function(request, response, next) {
     let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).single('meme');
     upload(request, response, function(err) {
         if (request.fileValidationError) {
@@ -111,15 +111,14 @@ app.post('/meme', function(request, response, next) {
         } else if (err) {
             return response.send(err);
         }
+        console.log(request.file.path);
         dao.insertMeme(request.file);
         fs.unlink(request.file.path, (err => {
             if (err) console.log(err);
         }));
+        response.redirect('http://localhost:3000/index.html');
+        response.end();
     });
-
-    response.redirect('http://localhost:3000/index.html');
-
-    response.end();
 })
 
 app.listen(port, () => {

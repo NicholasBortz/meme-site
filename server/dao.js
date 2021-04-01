@@ -5,7 +5,7 @@ var con = mysql.createConnection({
   host: "localhost",
   user: "sqluser",
   password: "N1ch0l@s",
-  database: "yelp"
+  database: "meme"
 });
 
 con.connect(function(err) {
@@ -59,32 +59,33 @@ module.exports = {
   },
 
   insertMeme: function (meme) {
-    con.query("INSERT INTO meme (meme, type, name) VALUES( ? )", [[Rot13(fs.readFileSync(meme.path)), Rot13(meme.mimetype), Rot13(meme.filename)]],
+    con.query("INSERT INTO meme (meme, type, name) VALUES( ? )", [[fs.readFileSync(meme.path), Rot13(meme.mimetype), Rot13(meme.filename)]],
     function (err, result) {
       if (err) throw err;
     });
   },
   getRandomMeme: function () {
+    console.log("Getting random meme:");
     return new Promise(function(resolve, reject) {
-      con.query("SELECT * FROM meme;", function(err, result) {
+      con.query("SELECT * FROM meme;", async function(err, result) {
         if (err) throw err;
   
         randIndex = Math.floor(Math.random() * Math.floor(result.length));
-        const extension = RevRot13(result[randIndex]["type"]).split("/").pop();
+        var extension = Rot13(result[randIndex]["type"]);
+        extension = extension.split("/").pop();
 
-        console.log(result[randIndex]["name"], RevRot13(result[randIndex]["name"]));
-
-        const img = fs.writeFile("../public/img/" + RevRot13(result[randIndex]["name"]), RevRot13(result[randIndex]["meme"]), function(err) {
+        const img = fs.writeFile("../public/img/" + Rot13(result[randIndex]["name"]), result[randIndex]["meme"], function(err) {
           if (err) throw err;
         });
-        resolve(RevRot13(result[randIndex]["name"]));
+        resolve(Rot13(result[randIndex]["name"]));
       });
     });
   }
 };
 
-function Rot13(input) {
-  var alphabet = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789";
+function Rot13(_input) {
+  var alphabet = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+  var input = String(_input).toLowerCase();
 
   var output = "";
   for (var i = 0; i < input.length; i++) {
@@ -101,21 +102,24 @@ function Rot13(input) {
   }
   return output;
 }
-function RevRot13(input) {
-  var alphabet = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789";
+// function RevRot13(input) {
+//   return new Promise(function(resolve, reject) {
+//     var alphabet = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789";
 
-  var output = "";
-  for (var i = 0; i < input.length; i++) {
-      for (var j = alphabet.length - 1; j >= 0; j++) {
-          if (input[i] == alphabet[j]) {
-              break;
-          }
-      }
-      if (j < alphabet.length) {
-          output += input[i];
-      } else {
-          output += alphabet[j - 13];
-      }
-  }
-  return output;
-}
+//     var output = "";
+//     for (var i = 0; i < input.length; i++) {
+//         for (var j = alphabet.length - 1; j >= 0; j--) {
+//             if (input[i] == alphabet[j]) {
+//                 break;
+//             }
+//         }
+//         if (j < alphabet.length) {
+//             output += input[i];
+//         } else {
+//             output += alphabet[j - 13];
+//         }
+//     }
+//     console.log(output);
+//     resolve(output);
+//   });
+// }
