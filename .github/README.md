@@ -11,7 +11,7 @@
 
 ## Checkout this project
 ```bash
-$ git clone https://github.com/timburr1/yelpForAnything.git
+$ git clone https://github.com/NicholasBortz/meme-site.git
 ```
 
 ## Install Node.js and NPM
@@ -26,14 +26,14 @@ $ sudo mysql
 ``` 
 Create a new database schema:
 ```sql
-create database yelp; 
-use yelp;
+create database meme; 
+use meme;
 ```
 Grant your existing sqluser permissions on that schema:
 ```sql
 ALTER USER 'sqluser'@'localhost' IDENTIFIED WITH mysql_native_password BY 'sqluserpw';
 GRANT USAGE ON *.* TO sqluser@localhost;
-GRANT ALL PRIVILEGES ON yelp.* TO sqluser@localhost;
+GRANT ALL PRIVILEGES ON meme.* TO sqluser@localhost;
 ```
 
 ## Project dependencies
