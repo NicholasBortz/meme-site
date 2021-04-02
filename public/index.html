@@ -26,50 +26,15 @@
 
 				xhr.onreadystatechange = function() {
 					if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
-						document.getElementById("memer").innerHTML = this.responseText;
+						document.getElementById("memer").innerHTML = "<img id='meme' src='img/" + this.responseText + "'>";
 					}
 				}
-
-				xhr.send();
-			}
-
-			function getImp() {
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", "http://localhost:3000/crewOrImp", true);
-				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-				xhr.onreadystatechange = function() {
-        			if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
-            			document.getElementById("amongDiv").innerHTML = this.responseText;
-						document.getElementById("among").style.border = "5px solid " + document.getElementById("among").alt;
-       				}
-				};
-
-				xhr.send();
-			}
-
-			function flipCoin() {
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", "http://localhost:3000/whichIsBetter", true);
-				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-				xhr.onreadystatechange = function() {
-        			if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
-            			document.getElementById("flip").innerHTML = this.responseText;
-       				}
-				};
-
 				xhr.send();
 			}
 		</script>
-		<h1>Test Memer, Best Memer!</h1>
+		<h1>Memerator</h1>
 
 		<div id="main" class="main-text">
-			<!-- <div class="main-text">
-				<button onclick="insertMeme()">Insert a new meme</button>
-				<input id="url" type="text">
-			</div> -->
-
 			<div class="main-text">
 				<h2>Insert a Meme Here</h2>
 				<form action="/meme" method="post" enctype="multipart/form-data">
@@ -84,18 +49,8 @@
 			</div>
 			<div id="memer" class="main-text">
 			</div>
-			<!-- <div class="main-text">
-				<button onclick="getImp()">Am I a crewmate or an imposter?</button>
-			</div>
-			<div id="amongDiv" class="main-text"></div>
-			<div class="main-text">
-				<button onclick="flipCoin()">Is Marvel or DC better?</button>
-				<br />
-				Answer here: 
-			</div>
-			<div id="flip" class="main-text"></div> -->
 		</div>
 		
-		<footer style="margin: 10px;">Go Patriots!</footer>
+		<footer style="margin: 10px;">Go Grizzlies!</footer>
 	</body>
 </html>

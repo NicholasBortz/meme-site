@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var fs = require('fs');
 
+//Set up the connection to the database
 var con = mysql.createConnection({
   host: "localhost",
   user: "sqluser",
@@ -8,6 +9,7 @@ var con = mysql.createConnection({
   database: "meme"
 });
 
+//Creates a meme table on the database to store all given memes
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
@@ -20,52 +22,17 @@ con.connect(function(err) {
 });
 
 module.exports = {
-  deleteRating: function (ratee, stars, comment) {
-    //TODO
-    console.log("Called Delete Rating");
-  },
-  
-  getAllRatings: async function() {
-    return new Promise(function (resolve, reject) {
-      let ratings = "";
 
-      con.query("SELECT * FROM rating;", function (err, result) {
-        if (err) throw err;
-
-        for (let i = 0; i < result.length; i++) {
-          ratings += '<span id="span-' + i + '">';
-          ratings += "Item Rated: ";
-          ratings += result[i]["ratee"];
-          ratings += "<br />";
-          ratings += result[i]["stars"];
-          ratings += " Stars<br />";
-          ratings += result[i]["comment"];
-          ratings += "<br />";
-          ratings += "<br />";
-          ratings += "</span>";
-          ratings += "\n";
-        }
-
-        resolve(ratings);
-      });
-  });
-  },
-  
-  insertRating: function (ratee, stars, comment) {
-    con.query("INSERT INTO rating VALUES ( ? )", [[ratee, stars, comment]], 
-    function (err, result) {
-        if (err) throw err;
-    });    
-  },
-
+  //Inserts a given meme into the database after encrypting it
   insertMeme: function (meme) {
     con.query("INSERT INTO meme (meme, type, name) VALUES( ? )", [[fs.readFileSync(meme.path), Rot13(meme.mimetype), Rot13(meme.filename)]],
     function (err, result) {
       if (err) throw err;
     });
   },
+
+  //Gets a random meme from the database and returns it to app.js
   getRandomMeme: function () {
-    console.log("Getting random meme:");
     return new Promise(function(resolve, reject) {
       con.query("SELECT * FROM meme;", async function(err, result) {
         if (err) throw err;
@@ -74,15 +41,19 @@ module.exports = {
         var extension = Rot13(result[randIndex]["type"]);
         extension = extension.split("/").pop();
 
+        //makes the blob from the database into a file that can be grabbed from index.html
+        //All information is decrypted after being grabbed from the database
         const img = fs.writeFile("../public/img/" + Rot13(result[randIndex]["name"]), result[randIndex]["meme"], function(err) {
           if (err) throw err;
         });
+        //Returns the name of the file to look up
         resolve(Rot13(result[randIndex]["name"]));
       });
     });
   }
 };
 
+//automatically encrypts and decrypts any given string
 function Rot13(_input) {
   var alphabet = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
   var input = String(_input).toLowerCase();
@@ -102,24 +73,3 @@ function Rot13(_input) {
   }
   return output;
 }
-// function RevRot13(input) {
-//   return new Promise(function(resolve, reject) {
-//     var alphabet = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789";
-
-//     var output = "";
-//     for (var i = 0; i < input.length; i++) {
-//         for (var j = alphabet.length - 1; j >= 0; j--) {
-//             if (input[i] == alphabet[j]) {
-//                 break;
-//             }
-//         }
-//         if (j < alphabet.length) {
-//             output += input[i];
-//         } else {
-//             output += alphabet[j - 13];
-//         }
-//     }
-//     console.log(output);
-//     resolve(output);
-//   });
-// }
