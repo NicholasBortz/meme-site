@@ -41,8 +41,9 @@ Open this project in Visual Studio Code. Open a new Terminal from the menu, or u
 Install dependencies:
 ```bash
 > cd server
-> npm install
+> npm update
 ```
+
 Run the web server with 
 ```
 > npm run start
