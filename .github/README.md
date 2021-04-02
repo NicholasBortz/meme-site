@@ -1,8 +1,8 @@
-# I-Project
+# Meme-Site
 ![](https://img.shields.io/github/repo-size/NicholasBortz/meme-site)
 ![](https://img.shields.io/github/contributors/NicholasBortz/meme-site)
 ![](https://img.shields.io/github/last-commit/NicholasBortz/meme-site)
-<br>Simple ratings web page, built with MySQL and Node.js.
+<br>Meme Generator using a mysql database and a basic Caesar Cipher encryption algorithm
 
 ## Prerequisites
 * [**MySQL**](https://www.mysql.com/downloads/) and [**Workbench**](https://www.linuxhelp.com/how-to-install-mysql-workbench-on-linux-mint-18-03)
