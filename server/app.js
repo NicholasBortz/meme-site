@@ -48,7 +48,15 @@ app.get('/getMeme', async (request, response) => {
 app.post('/meme', async function(request, response, next) {
     let upload = multer({ storage: storage, fileFilter: helpers.imageFilter }).single('meme');
     upload(request, response, function(err) {
-        checkErrors(request, response, err);
+        if (request.fileValidationError) {
+            return response.send(request.fileValidationError);
+        } else if (!request.file) {
+            return response.send('Please select a meme to upload');
+        } else if (err instanceof multer.MulterError) {
+            return response.send(err);
+        } else if (err) {
+            return response.send(err);
+        }
 
         dao.insertMeme(request.file);
         fs.unlink(request.file.path, (err => { if (err) console.log(err); }));
@@ -71,17 +79,4 @@ function clearDirectory(dir) {
             }));
         });
     });
-}
-
-//Checks for errors when an input meme is given
-function checkErrors(request, response, err) {
-    if (request.fileValidationError) {
-        return response.send(request.fileValidationError);
-    } else if (!request.file) {
-        return response.send('Please select a meme to upload');
-    } else if (err instanceof multer.MulterError) {
-        return response.send(err);
-    } else if (err) {
-        return response.send(err);
-    }
 }

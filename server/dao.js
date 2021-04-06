@@ -14,7 +14,7 @@ con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
 
-  var createTable = "CREATE TABLE IF NOT EXISTS meme (id INT AUTO_INCREMENT, meme MEDIUMBLOB, type VARCHAR(25), name VARCHAR(256), PRIMARY KEY(id));";
+  var createTable = "CREATE TABLE IF NOT EXISTS meme (id INT AUTO_INCREMENT, meme MEDIUMBLOB, name VARCHAR(256), PRIMARY KEY(id));";
   con.query(createTable, function (err, result) {
     if (err) throw err;
     console.log("Table created");
@@ -25,7 +25,10 @@ module.exports = {
 
   //Inserts a given meme into the database after encrypting it
   insertMeme: function (meme) {
-    con.query("INSERT INTO meme (meme, type, name) VALUES( ? )", [[fs.readFileSync(meme.path), Rot13(meme.mimetype), Rot13(meme.filename)]],
+    var data = fs.readFileSync(meme.path);
+    var name = Rot31(meme.filename);
+
+    con.query("INSERT INTO meme (meme, name) VALUES( ? )", [[data, name]],
     function (err, result) {
       if (err) throw err;
     });
@@ -38,25 +41,25 @@ module.exports = {
         if (err) throw err;
   
         randIndex = Math.floor(Math.random() * Math.floor(result.length));
-        var extension = Rot13(result[randIndex]["type"]);
-        extension = extension.split("/").pop();
+        var name = Rot31(result[randIndex]["name"]);
+        var data = result[randIndex]["meme"];
 
         //makes the blob from the database into a file that can be grabbed from index.html
         //All information is decrypted after being grabbed from the database
-        const img = fs.writeFile("../public/img/" + Rot13(result[randIndex]["name"]), result[randIndex]["meme"], function(err) {
+        const img = fs.writeFile("../public/img/" + name, data, function(err) {
           if (err) throw err;
         });
         //Returns the name of the file to look up
-        resolve(Rot13(result[randIndex]["name"]));
+        resolve(name);
       });
     });
   }
 };
 
 //automatically encrypts and decrypts any given string
-function Rot13(_input) {
-  var alphabet = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
-  var input = String(_input).toLowerCase();
+function Rot31(_input) {
+  var alphabet = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789";
+  var input = String(_input);
 
   var output = "";
   for (var i = 0; i < input.length; i++) {
@@ -68,7 +71,7 @@ function Rot13(_input) {
       if (j >= alphabet.length) {
           output += input[i];
       } else {
-          output += alphabet[j + 13];
+          output += alphabet[j + 31];
       }
   }
   return output;
